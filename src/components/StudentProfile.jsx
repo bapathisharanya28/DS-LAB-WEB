@@ -29,7 +29,7 @@ export default function StudentProfile({ student, onEditProfile, onViewPortfolio
           </div>
           <div className="flex items-center gap-1">
             <button onClick={onEditProfile} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-white/10"><Edit3 className="w-3 h-3" /> Edit</button>
-            <button onClick={onViewPortfolio} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] bg-violet-600 text-white hover:bg-violet-700"><FileText className="w-3 h-3" /> View More</button>
+            <button onClick={onViewPortfolio} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] bg-violet-600 text-white hover:bg-violet-700"><FileText className="w-3 h-3" />PORTFOLIO</button>
           </div>
         </div>
       </div>
