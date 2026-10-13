@@ -41,6 +41,7 @@ Mohan Babu University
 
 [Data Science Digital Library](https://github.com/bapathisharanya28/ds-lab-website)
 
----
-
+---------------------------------------------------------|
+website link:https://ds-lab-website-u2ut.onrender.com    |
+---------------------------------------------------------|
 *Built to support interactive learning, practical experimentation, and project-based exploration in Data Science.*
