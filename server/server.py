@@ -6,10 +6,13 @@ import sys
 import os
 import tempfile
 import time
+import urllib.request
 from urllib.parse import urlparse
 
 PORT = 5050
 STATE_FILE = os.path.join(os.path.dirname(__file__), "data", "site-state.json")
+IRIS_CACHE_FILE = os.path.join(os.path.dirname(__file__), "data", "iris.csv")
+IRIS_DATASET_URL = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
 
 # Create sample dataset in current directory so users can run pd.read_csv("students.csv")
 SAMPLE_CSV_CONTENT = """id,name,age,grade,score,attendance
@@ -148,7 +151,7 @@ class PythonExecutionHandler(http.server.BaseHTTPRequestHandler):
             
             # Check installed packages
             packages = []
-            for pkg in ['numpy', 'pandas', 'matplotlib', 'seaborn', 'scipy', 'requests', 'openpyxl']:
+            for pkg in ['numpy', 'pandas', 'matplotlib', 'seaborn', 'scipy', 'requests', 'openpyxl', 'bs4', 'lxml']:
                 try:
                     __import__(pkg)
                     packages.append(pkg)
@@ -249,6 +252,12 @@ class PythonExecutionHandler(http.server.BaseHTTPRequestHandler):
             csv_path = os.path.join(tmpdir, "students.csv")
             with open(csv_path, "w", encoding="utf-8") as f:
                 f.write(SAMPLE_CSV_CONTENT)
+            if "iris.csv" in code:
+                self.ensure_iris_cache()
+                with open(IRIS_CACHE_FILE, "rb") as source_file, open(
+                    os.path.join(tmpdir, "iris.csv"), "wb"
+                ) as cache_file:
+                    cache_file.write(source_file.read())
 
             # Prepare runner script
             # Escaping code safely
@@ -306,6 +315,22 @@ class PythonExecutionHandler(http.server.BaseHTTPRequestHandler):
                     "executionTime": 0.0,
                     "engine": "Native Python Runtime"
                 }
+
+    def ensure_iris_cache(self):
+        if os.path.isfile(IRIS_CACHE_FILE):
+            return
+
+        os.makedirs(os.path.dirname(IRIS_CACHE_FILE), exist_ok=True)
+        temporary_file = f"{IRIS_CACHE_FILE}.tmp"
+        try:
+            with urllib.request.urlopen(IRIS_DATASET_URL, timeout=15) as response:
+                with open(temporary_file, "wb") as cache_file:
+                    cache_file.write(response.read())
+            os.replace(temporary_file, IRIS_CACHE_FILE)
+        except Exception:
+            if os.path.exists(temporary_file):
+                os.remove(temporary_file)
+            raise
 
 def run_server():
     server_address = ('', PORT)

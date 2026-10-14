@@ -126,9 +126,8 @@ export const INITIAL_MODULES = [
 
 const csvCode = `import pandas as pd
 
-# 1A.1 - Read an online CSV file
-url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
-df = pd.read_csv(url)
+# 1A.1 - Read the cached Iris CSV file
+df = pd.read_csv("iris.csv")
 print("First five rows of the dataset:")
 print(df.head())
 print("\\nDataset Information:")
@@ -538,6 +537,80 @@ print(df.groupby("species")["petal_width"].mean())
 print("\\nMaximum sepal length by species:")
 print(df.groupby("species")["sepal_length"].max())`;
 
+const exp8a = `import requests
+from bs4 import BeautifulSoup
+
+# 8A - Scrape book titles and prices from books.toscrape.com
+url = "https://books.toscrape.com/"
+response = requests.get(url, timeout=10)
+soup = BeautifulSoup(response.content, "lxml")
+
+books = soup.select("article.product_pod")
+print(f"Books found on page: {len(books)}")
+print("\\\\nFirst 5 books:")
+for book in books[:5]:
+    title = book.h3.a["title"]
+    price = book.select_one("p.price_color").text.strip()
+    rating = book.p["class"][1]
+    print(f"  Title  : {title}")
+    print(f"  Price  : {price}")
+    print(f"  Rating : {rating}")
+    print()`;
+
+const exp8b = `import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# 8B - Scrape an HTML table from Wikipedia into a Pandas DataFrame
+url = "https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)"
+headers = {"User-Agent": "Mozilla/5.0 (DS-Lab/1.0)"}
+response = requests.get(url, headers=headers, timeout=10)
+soup = BeautifulSoup(response.content, "lxml")
+
+# Find the first wikitable on the page
+table = soup.find("table", {"class": "wikitable"})
+if table:
+    rows = table.find_all("tr")
+    header_cells = [th.get_text(strip=True) for th in rows[0].find_all(["th", "td"])]
+    data = []
+    for row in rows[1:6]:   # First 5 data rows
+        cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+        if cols:
+            data.append(cols)
+    max_cols = max(len(r) for r in data)
+    col_names = header_cells[:max_cols] if len(header_cells) >= max_cols else None
+    df = pd.DataFrame(data, columns=col_names)
+    print("Scraped Wikipedia table (first 5 rows):")
+    print(df.to_string(index=False))
+else:
+    print("Table not found.")`;
+
+const exp8c = `import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# 8C - Multi-page scraping: collect books from 3 pages
+base_url = "https://books.toscrape.com/catalogue/page-{}.html"
+all_books = []
+
+for page in range(1, 4):
+    url = base_url.format(page)
+    response = requests.get(url, timeout=10)
+    soup = BeautifulSoup(response.content, "lxml")
+    for book in soup.select("article.product_pod"):
+        title = book.h3.a["title"]
+        price = book.select_one("p.price_color").text.strip()
+        rating = book.p["class"][1]
+        all_books.append({"Title": title, "Price": price, "Rating": rating})
+    print(f"Page {page}: scraped {len(soup.select('article.product_pod'))} books")
+
+df = pd.DataFrame(all_books)
+print(f"\\\\nTotal books collected: {len(df)}")
+print("\\\\nSample data:")
+print(df.head(8).to_string(index=False))
+print("\\\\nRating distribution:")
+print(df["Rating"].value_counts())`;
+
 function sub(id,name,description,code,technologies){return {id,name,description,code,output:"",outputImages:[],technologies,date:"2026",status:"Published"}}
 export const INITIAL_EXPERIMENTS = [
   {id:1,number:1,name:"Working with Different Data Formats using Pandas",description:"A practical exploration of CSV, JSON, and Excel data handling with Pandas, including reading, writing, parsing, and working with multiple sheets.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas"],code:"",output:"",outputImages:[],subExperiments:[sub("1A","CSV File Handling","Read an online CSV dataset, write CSV output, and work with tab-delimited student data.",csvCode,["Python","Pandas","CSV"]),sub("1B","JSON File Handling","Create JSON records, read JSON files, parse JSON text, and consume JSON data from an API.",jsonCode,["Python","Pandas","JSON","API"]),sub("1C","Excel File Handling","Write and read Excel files, create multiple worksheets, and load all sheets with Pandas.",excelCode,["Python","Pandas","Excel","OpenPyXL"])]},
@@ -546,7 +619,8 @@ export const INITIAL_EXPERIMENTS = [
   {id:4,number:4,name:"Advanced Pandas Operations",description:"Explore hierarchical indexing, reshaping with stack and unstack, and combining complementary DataFrames with Pandas.",coverImage:"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","NumPy"],code:"",output:"",outputImages:[],subExperiments:[sub("4A","MultiIndex Series","Create and query a hierarchical Pandas Series using two index levels.",exp4a,["Python","Pandas","NumPy"]),sub("4B","Stack and Unstack","Reshape a MultiIndex Series into a DataFrame and stack it back into a Series.",exp4b,["Python","Pandas","NumPy"]),sub("4C","Combine First","Fill missing values in one DataFrame using values from another DataFrame.",exp4c,["Python","Pandas","NumPy"])]},
   {id:5,number:5,name:"Data Visualization with Matplotlib and Seaborn",description:"Create common analytical plots including line, bar, histogram, scatter, and box plots and view the generated figures directly in the lab.",coverImage:"https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Matplotlib","Seaborn"],code:"",output:"",outputImages:[],subExperiments:[sub("5A","Line Plot","Create a simple line chart with labels, title, and grid.",exp5a,["Python","Matplotlib"]),sub("5B","Bar Plot","Compare categorical values using a Pandas bar plot.",exp5b,["Python","Pandas","Matplotlib"]),sub("5C","Histogram and Density Plot","Visualize a random distribution with a histogram and KDE curve.",exp5c,["Python","Seaborn","Matplotlib"]),sub("5D","Scatter Plot","Visualize the relationship between two random numerical variables.",exp5d,["Python","NumPy","Matplotlib"]),sub("5E","Box Plot","Summarize distributions across multiple variables with a Seaborn box plot.",exp5e,["Python","Seaborn","Matplotlib"])]},
   {id:6,number:6,name:"Time Series Analysis",description:"Create and manipulate timestamp-indexed data, generate date ranges, work with time zones and periods, convert periods and timestamps between frequencies, and perform resampling, downsampling, and upsampling.",coverImage:"https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","Time Series"],code:"",output:"",outputImages:[],subExperiments:[sub("6A","Create a Time Series Using Datetime Objects","Create a Pandas Series indexed by timestamps.",exp6a,["Python","Pandas","Datetime"]),sub("6B","Generate Date Ranges and Work with Time Zones","Generate timestamps, localize a timezone, convert to another timezone, and combine timezone-aware series.",exp6b,["Python","Pandas","Timezone"]),sub("6C","Period Arithmetic and Period Ranges","Add and subtract integers from Period objects and create a range using period_range().",exp6c,["Python","Pandas","Period"]),sub("6D","Basic Time Series Resampling","Resample time-series observations and calculate monthly mean values.",exp6d,["Python","Pandas","Resampling"]),sub("6E","Convert Periods and PeriodIndex to Another Frequency","Use asfreq() to convert Period and PeriodIndex objects to another frequency, selecting the start or end of each period.",exp6e,["Python","Pandas","PeriodIndex","asfreq()"]),sub("6F","Convert Timestamp-Indexed Series and DataFrames to Periods","Use to_period() to convert timestamp indexes in Series and DataFrames into periods.",exp6f,["Python","Pandas","Series","DataFrame","to_period()"]),sub("6G","Resampling, Downsampling, and Upsampling","Resample hourly data, aggregate larger intervals, and upsample to 30-minute intervals with optional forward filling.",exp6g,["Python","Pandas","Resampling","Time Series"])]},
-  {id:7,number:7,name:"Data Aggregation",description:"Group tabular data using single or multiple keys, calculate grouped summary statistics, and perform exploratory data analysis on an online dataset.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","GroupBy","Aggregation","EDA"],code:"",output:"",outputImages:[],subExperiments:[sub("7A","Group Data Using Single and Multiple Keys","Create a DataFrame, group records by one or multiple keys, select groups, and calculate average marks.",exp7a,["Python","Pandas","DataFrame","groupby()"]),sub("7B","Compute Summary Statistics Using Aggregation","Calculate sum, mean, and standard deviation for Marks and Attendance grouped by department.",exp7b,["Python","Pandas","aggregate()","Statistics"]),sub("7C","GroupBy and Exploratory Data Analysis on an Online Dataset","Load the online Iris dataset, inspect and summarize it, group by one or multiple columns, and calculate species-level statistics.",exp7c,["Python","Pandas","Online Dataset","GroupBy","EDA"])]}];
+  {id:7,number:7,name:"Data Aggregation",description:"Group tabular data using single or multiple keys, calculate grouped summary statistics, and perform exploratory data analysis on an online dataset.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","GroupBy","Aggregation","EDA"],code:"",output:"",outputImages:[],subExperiments:[sub("7A","Group Data Using Single and Multiple Keys","Create a DataFrame, group records by one or multiple keys, select groups, and calculate average marks.",exp7a,["Python","Pandas","DataFrame","groupby()"]),sub("7B","Compute Summary Statistics Using Aggregation","Calculate sum, mean, and standard deviation for Marks and Attendance grouped by department.",exp7b,["Python","Pandas","aggregate()","Statistics"]),sub("7C","GroupBy and Exploratory Data Analysis on an Online Dataset","Load the online Iris dataset, inspect and summarize it, group by one or multiple columns, and calculate species-level statistics.",exp7c,["Python","Pandas","Online Dataset","GroupBy","EDA"])]},
+  {id:8,number:8,name:"Web Scraping with Requests and BeautifulSoup",description:"Extract data from live websites using Requests and BeautifulSoup, scrape HTML tables into Pandas DataFrames, and collect data across multiple pages.",coverImage:"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Requests","BeautifulSoup","lxml","Pandas"],code:"",output:"",outputImages:[],subExperiments:[sub("8A","Basic HTML Scraping","Send an HTTP request, parse the HTML with BeautifulSoup and lxml, and extract book titles, prices, and ratings from books.toscrape.com.",exp8a,["Python","Requests","BeautifulSoup","lxml"]),sub("8B","Scrape an HTML Table into a DataFrame","Download a Wikipedia page, locate the first HTML table using BeautifulSoup, and load it into a Pandas DataFrame.",exp8b,["Python","Requests","BeautifulSoup","Pandas"]),sub("8C","Multi-Page Scraping","Iterate across multiple catalogue pages, collect all book data, and analyse the rating distribution with Pandas.",exp8c,["Python","Requests","BeautifulSoup","Pandas"])]}];
 
 export const INITIAL_PROJECTS = [
   {
@@ -613,7 +687,7 @@ export const INITIAL_PROJECTS = [
   }
 ];
 
-export const DATA_VERSION = "ds-syllabus-v6";
+export const DATA_VERSION = "ds-syllabus-v7";
 const STORAGE_KEYS = { 
   PROFILE: "ds_lab_profile", 
   MODULES: "ds_lab_modules", 
