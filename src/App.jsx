@@ -15,7 +15,7 @@ import PortfolioPage from './components/PortfolioPage';
 import Footer from './components/Footer';
 
 import { loadStoredData, saveStoredData, INITIAL_PROJECTS } from './data/initialData';
-import { checkBackendHealth, loadRemoteState, saveRemoteState, warmUpPythonRuntime } from './services/pythonExecutionService';
+import { checkBackendHealth, loadRemoteState, saveRemoteState } from './services/pythonExecutionService';
 
 export default function App() {
   // Load persistent state from localStorage
@@ -132,18 +132,6 @@ export default function App() {
         }
         return health;
       });
-      if (!health.online) {
-        const warmUp = () => {
-          warmUpPythonRuntime().catch((error) => {
-            console.warn('Browser Python runtime could not be preloaded:', error);
-          });
-        };
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(warmUp, { timeout: 3000 });
-        } else {
-          window.setTimeout(warmUp, 1000);
-        }
-      }
     };
     checkServer();
     const interval = setInterval(checkServer, 10000);

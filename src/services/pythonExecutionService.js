@@ -6,10 +6,7 @@
 
 let pyodideInstance = null;
 let pyodideLoadingPromise = null;
-let pyodidePackagesLoadingPromise = null;
 const EXECUTION_TIMEOUT_MS = 15000;
-const BACKEND_HEALTH_TIMEOUT_MS = 1200;
-let backendHealth = null;
 
 function createTimeoutSignal(timeoutMs) {
   const controller = new AbortController();
@@ -26,8 +23,6 @@ function getBrowserUnsupportedModules(code) {
     ['sqlite3', /^\s*(?:import\s+sqlite3\b|from\s+sqlite3\b)/m],
     ['requests', /^\s*(?:import\s+requests\b|from\s+requests\b)/m],
     ['openpyxl', /^\s*(?:import\s+openpyxl\b|from\s+openpyxl\b)/m],
-    ['bs4 (BeautifulSoup)', /^\s*(?:import\s+bs4\b|from\s+bs4\b|from\s+beautifulsoup4\b)/m],
-    ['lxml', /^\s*(?:import\s+lxml\b|from\s+lxml\b)/m],
   ];
 
   for (const [moduleName, pattern] of modulePatterns) {
@@ -35,16 +30,6 @@ function getBrowserUnsupportedModules(code) {
   }
 
   return unsupported;
-}
-
-function getRequiredPyodidePackages(code) {
-  const packages = [];
-  if (/^\s*(?:import\s+numpy\b|from\s+numpy\b)/m.test(code)) packages.push('numpy');
-  if (/^\s*(?:import\s+pandas\b|from\s+pandas\b)/m.test(code)) packages.push('pandas');
-  if (/^\s*(?:import\s+matplotlib\b|from\s+matplotlib\b|import\s+seaborn\b|from\s+seaborn\b)/m.test(code)) {
-    packages.push('matplotlib');
-  }
-  return packages;
 }
 
 async function preparePyodideCode(pyodide, code, onStatusUpdate) {
@@ -106,26 +91,25 @@ export async function saveRemoteState(state) {
 }
 
 export async function checkBackendHealth() {
-  const healthUrls = ['/api/health', 'http://localhost:5050/api/health'];
-
-  for (const url of healthUrls) {
-    const timeout = createTimeoutSignal(BACKEND_HEALTH_TIMEOUT_MS);
+  try {
+    const res = await fetch('/api/health', { method: 'GET' });
+    if (res.ok) {
+      const data = await res.json();
+      return { online: true, ...data };
+    }
+  } catch (err) {
+    // If relative fetch fails, try direct localhost:5050
     try {
-      const res = await fetch(url, { method: 'GET', signal: timeout.signal });
-      if (res.ok) {
-        const data = await res.json();
-        backendHealth = { online: true, ...data };
-        return backendHealth;
+      const directRes = await fetch('http://localhost:5050/api/health', { method: 'GET' });
+      if (directRes.ok) {
+        const data = await directRes.json();
+        return { online: true, ...data };
       }
-    } catch {
-      // Try the next health endpoint before using the browser runtime.
-    } finally {
-      timeout.clear();
+    } catch (e) {
+      // Backend not running
     }
   }
-
-  backendHealth = { online: false, engine: 'Pyodide WebAssembly' };
-  return backendHealth;
+  return { online: false, engine: 'Pyodide WebAssembly' };
 }
 
 /**
@@ -138,56 +122,52 @@ export async function executePythonCode(code, onStatusUpdate = () => {}) {
   const startTime = performance.now();
 
   // 1. Try Native Python Backend first
-  const health = backendHealth || await checkBackendHealth();
-  if (health.online) {
-    try {
-      onStatusUpdate('Connecting to Python 3.11 Execution Server...');
-      const requestBody = JSON.stringify({ code });
-      const apiUrls = ['/api/execute', 'http://localhost:5050/api/execute'];
-      let response = null;
-      let lastBackendError = null;
+  try {
+    onStatusUpdate('Connecting to Python 3.11 Execution Server...');
+    const requestBody = JSON.stringify({ code });
+    const apiUrls = ['/api/execute', 'http://localhost:5050/api/execute'];
+    let response = null;
+    let lastBackendError = null;
 
-      for (const apiUrl of apiUrls) {
-        const timeout = createTimeoutSignal(EXECUTION_TIMEOUT_MS);
-        try {
-          response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: requestBody,
-            signal: timeout.signal,
-          });
-          if (response.ok) break;
-          lastBackendError = new Error(`Execution server returned HTTP ${response.status}.`);
-        } catch (error) {
-          lastBackendError = error;
-        } finally {
-          timeout.clear();
-        }
+    for (const apiUrl of apiUrls) {
+      const timeout = createTimeoutSignal(EXECUTION_TIMEOUT_MS);
+      try {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: requestBody,
+          signal: timeout.signal,
+        });
+        if (response.ok) break;
+        lastBackendError = new Error(`Execution server returned HTTP ${response.status}.`);
+      } catch (error) {
+        lastBackendError = error;
+      } finally {
+        timeout.clear();
       }
-
-      if (response && response.ok) {
-        onStatusUpdate('Processing outputs & generated figures...');
-        const data = await response.json();
-        return {
-          success: data.success ?? true,
-          stdout: data.stdout || '',
-          stderr: data.stderr || '',
-          error: data.error || null,
-          images: data.images || [],
-          executionTime: data.executionTime || ((performance.now() - startTime) / 1000).toFixed(3),
-          engine: data.engine || 'Python 3.11 Native Server'
-        };
-      }
-
-      if (lastBackendError?.name === 'AbortError') {
-        onStatusUpdate('Python server timed out; switching to browser runtime...');
-      } else {
-        onStatusUpdate('Python server unavailable; switching to browser runtime...');
-      }
-    } catch (backendError) {
-      console.warn('Native backend unavailable, switching to in-browser Pyodide:', backendError);
     }
-    backendHealth = { online: false, engine: 'Pyodide WebAssembly' };
+
+    if (response && response.ok) {
+      onStatusUpdate('Processing outputs & generated figures...');
+      const data = await response.json();
+      return {
+        success: data.success ?? true,
+        stdout: data.stdout || '',
+        stderr: data.stderr || '',
+        error: data.error || null,
+        images: data.images || [],
+        executionTime: data.executionTime || ((performance.now() - startTime) / 1000).toFixed(3),
+        engine: data.engine || 'Python 3.11 Native Server'
+      };
+    }
+
+    if (lastBackendError?.name === 'AbortError') {
+      onStatusUpdate('Python server timed out; switching to browser runtime...');
+    } else {
+      onStatusUpdate('Python server unavailable; switching to browser runtime...');
+    }
+  } catch (backendError) {
+    console.warn('Native backend unavailable, switching to in-browser Pyodide:', backendError);
   }
 
   const unsupportedModules = getBrowserUnsupportedModules(code);
@@ -207,11 +187,6 @@ export async function executePythonCode(code, onStatusUpdate = () => {}) {
   try {
     onStatusUpdate('Initializing in-browser Pyodide Python runtime...');
     const pyodide = await getPyodide(onStatusUpdate);
-    const requiredPackages = getRequiredPyodidePackages(code);
-    if (requiredPackages.length) {
-      onStatusUpdate(`Loading Python package${requiredPackages.length > 1 ? 's' : ''}...`);
-      await loadPyodidePackages(pyodide, requiredPackages);
-    }
     
     onStatusUpdate('Executing Python code in Pyodide sandbox...');
     const preparedCode = await preparePyodideCode(pyodide, code, onStatusUpdate);
@@ -332,7 +307,9 @@ async function getPyodide(onProgress) {
         });
       }
 
+      onProgress('Loading Python packages (numpy, pandas, matplotlib)...');
       const pyodide = await window.loadPyodide();
+      await pyodide.loadPackage(['numpy', 'pandas', 'matplotlib']);
     
     // Provide sample dataset in virtual filesystem
     pyodide.FS.writeFile('students.csv', `id,name,age,grade,score,attendance
@@ -357,21 +334,4 @@ async function getPyodide(onProgress) {
   })();
 
   return pyodideLoadingPromise;
-}
-
-async function loadPyodidePackages(pyodide, packages) {
-  if (!pyodidePackagesLoadingPromise) {
-    pyodidePackagesLoadingPromise = pyodide.loadPackage(packages);
-  } else {
-    await pyodidePackagesLoadingPromise;
-    const missingPackages = packages.filter((name) => !pyodide.loadedPackages?.[name]);
-    if (missingPackages.length) {
-      pyodidePackagesLoadingPromise = pyodide.loadPackage(missingPackages);
-    }
-  }
-  await pyodidePackagesLoadingPromise;
-}
-
-export function warmUpPythonRuntime() {
-  return getPyodide(() => {});
 }

@@ -45,12 +45,17 @@ export default function Footer({ student }) {
               Institutional Context
             </span>
             <p className="text-stone-700 dark:text-stone-300">
-              <strong className="text-stone-900 dark:text-stone-100">University:</strong> {student?.university || 'Mohan Babu University'}
+              <strong className="text-stone-900 dark:text-stone-100">University:</strong> {student?.university || 'Institute of Technology'}
             </p>
             <p className="text-stone-700 dark:text-stone-300">
               <strong className="text-stone-900 dark:text-stone-100">Subject:</strong> {student?.subject || 'Data Science Laboratory'}
             </p>
-            
+            <p className="text-stone-700 dark:text-stone-300">
+              <strong className="text-stone-900 dark:text-stone-100">Advisor:</strong> {student?.faculty || 'Faculty of AI & ML'}
+            </p>
+            <p className="text-stone-700 dark:text-stone-300">
+              <strong className="text-stone-900 dark:text-stone-100">Lab Code:</strong> <span className="font-mono">DS-LAB-602</span>
+            </p>
           </div>
 
           {/* Col 3: Quick Navigation */}

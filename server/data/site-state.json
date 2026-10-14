@@ -216,22 +216,22 @@
       "number": 1,
       "name": "Working with Different Data Formats using Pandas",
       "description": "A practical exploration of CSV, JSON, and Excel data handling with Pandas, including reading, writing, parsing, and working with multiple sheets.",
-      "code": "",
-      "output": "",
-      "outputImages": [],
+      "coverImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",
+      "date": "2026",
+      "status": "Published",
       "technologies": [
         "Python",
         "Pandas"
       ],
-      "date": "2026",
-      "status": "Published",
-      "coverImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",
+      "code": "",
+      "output": "",
+      "outputImages": [],
       "subExperiments": [
         {
           "id": "1A",
           "name": "CSV File Handling",
           "description": "Read an online CSV dataset, write CSV output, and work with tab-delimited student data.",
-          "code": "\nimport pandas as pd\nfrom pathlib import Path\n\n# 1A.1 - Read the online CSV file (use a local copy if already downloaded)\nurl = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv\"\ncache_file = Path(\"iris.csv\")\n\nif cache_file.exists():\n    df = pd.read_csv(cache_file)\nelse:\n    df = pd.read_csv(url)\n    df.to_csv(cache_file, index=False)\n\nprint(\"First five rows of the dataset:\")\nprint(df.head())\n\nprint(\"\\nDataset Information:\")\ndf.info()\n\nprint(\"\\nNumber of rows and columns:\")\nprint(df.shape)\n\n# 1A.2 - Write the DataFrame to CSV\noutput_file = \"iris_output.csv\"\ndf.to_csv(output_file, index=False)\nprint(f\"\\nThe dataset has been successfully written to {output_file}\")\n\n# 1A.3 - Create a tab-delimited student file, then read it\nstudent_data = {\n    \"Roll_No\": [101, 102, 103, 104],\n    \"Name\": [\"Anusha\", \"Babitha\", \"Charitha\", \"Deepika\"],\n    \"Department\": [\"IT\", \"IT\", \"CSE\", \"ECE\"],\n    \"Percentage\": [89, 92, 88, 85]\n}\n\nstudent_df = pd.DataFrame(student_data)\nstudent_df.to_csv(\"students.txt\", sep=\"\\t\", index=False)\nprint(\"\\nData successfully written to students.txt\")\n\nprint(\"\\nStudent data read from the tab-delimited file:\")\nprint(pd.read_csv(\"students.txt\", sep=\"\\t\"))\n",
+          "code": "import pandas as pd\n\n# 1A.1 - Read an online CSV file\nurl = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv\"\ndf = pd.read_csv(url)\nprint(\"First five rows of the dataset:\")\nprint(df.head())\nprint(\"\\nDataset Information:\")\nprint(df.info())\nprint(\"\\nNumber of rows and columns:\")\nprint(df.shape)\n\n# 1A.2 - Write the DataFrame to CSV\noutput_file = \"iris_output.csv\"\ndf.to_csv(output_file, index=False)\nprint(f\"\\nThe dataset has been successfully written to {output_file}\")\n\n# 1A.3 - Create a tab-delimited student file, then read it\nstudent_data = {\n    \"Roll_No\": [101, 102, 103, 104],\n    \"Name\": [\"Anusha\", \"Babitha\", \"Charitha\", \"Deepika\"],\n    \"Department\": [\"IT\", \"IT\", \"CSE\", \"ECE\"],\n    \"Percentage\": [89, 92, 88, 85]\n}\nstudent_df = pd.DataFrame(student_data)\nstudent_df.to_csv(\"students.txt\", sep=\"\\t\", index=False)\nprint(\"\\nData successfully written to students.txt\")\n\nprint(\"\\nStudent data read from the tab-delimited file:\")\nprint(pd.read_csv(\"students.txt\", sep=\"\\t\"))",
           "output": "",
           "outputImages": [],
           "technologies": [
@@ -240,19 +240,7 @@
             "CSV"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": true,
-          "statusMessage": "Connecting to Python 3.11 Execution Server...",
-          "executionTime": 0.012,
-          "runResult": {
-            "success": false,
-            "stdout": "",
-            "stderr": "",
-            "error": "Traceback (most recent call last):\n  File \"C:\\Users\\bapat\\AppData\\Local\\Temp\\tmpna6p92kq\\runner.py\", line 109, in <module>\n    compiled = compile(USER_CODE, '<experiment>', 'exec')\n  File \"<experiment>\", line 1\n    ```python\n    ^\nSyntaxError: invalid syntax",
-            "images": [],
-            "executionTime": 0.012,
-            "engine": "Native Python Runtime"
-          }
+          "status": "Published"
         },
         {
           "id": "1B",
@@ -268,8 +256,7 @@
             "API"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         },
         {
           "id": "1C",
@@ -285,8 +272,7 @@
             "OpenPyXL"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         }
       ]
     },
