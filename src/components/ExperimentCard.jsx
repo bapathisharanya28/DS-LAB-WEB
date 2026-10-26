@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, ArrowRight, Calendar, CheckCircle2, Edit3, Trash2 } from 'lucide-react';
+import { Play, ArrowRight, Calendar, CheckCircle2 } from 'lucide-react';
 
 export default function ExperimentCard({ experiment, onSelect, onSelectSub, onQuickRun, onEdit, onDelete }) {
   const formattedNum = String(experiment.number || experiment.id).padStart(2, '0');
@@ -43,8 +43,6 @@ export default function ExperimentCard({ experiment, onSelect, onSelectSub, onQu
           <div className="flex flex-wrap items-center gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
             <button onClick={onQuickRun} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-all"><Play className="w-3.5 h-3.5 fill-current" /> RUN CODE</button>
             <button onClick={onSelect} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-stone-100 dark:bg-white/5 text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800 transition-all">VIEW LAB <ArrowRight className="w-3.5 h-3.5" /></button>
-            <button onClick={onEdit} className="p-2 rounded-lg border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:text-violet-600"><Edit3 className="w-3.5 h-3.5" /></button>
-            <button onClick={onDelete} className="p-2 rounded-lg border border-rose-300/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10"><Trash2 className="w-3.5 h-3.5" /></button>
           </div>
         </div>
       </div>

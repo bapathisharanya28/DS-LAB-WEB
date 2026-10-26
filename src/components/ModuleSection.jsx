@@ -13,7 +13,6 @@ export default function ModuleSection({ modules, onSelectModule, onAddModule, on
             <p className="text-sm sm:text-base text-stone-700 dark:text-stone-300 mt-1 max-w-xl">Theory and learning-overview sections based on the Data Science course syllabus.</p>
           </div>
           <div className="text-xs font-mono text-stone-500 dark:text-stone-400">Total Periods: 45</div>
-          <button onClick={onAddModule} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-md transition-all"><Plus className="w-4 h-4" /> ADD MODULE</button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {modules.map((module) => (

@@ -25,6 +25,56 @@ SAMPLE_CSV_CONTENT = """id,name,age,grade,score,attendance
 10,Julia,20,A,94.0,95.0
 """
 
+SAMPLE_REVIEWS_HTML = """<!DOCTYPE html>
+<html>
+<head><title>Customer Reviews</title></head>
+<body>
+<div id="reviews-medley-footer">
+  <div class="review">
+    <div class="review-title">Great product</div>
+    <div class="rating">5 out of 5</div>
+    <div class="review-text">Excellent quality! Works like a charm and very durable. I am extremely satisfied with this purchase. Highly recommend to everyone looking for great value!</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Not satisfied</div>
+    <div class="rating">2 out of 5</div>
+    <div class="review-text">The product stopped working after three days. Very poor build and terrible customer service. Defective piece and completely disappointed. Do not buy!</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Worth buying</div>
+    <div class="rating">4 out of 5</div>
+    <div class="review-text">Good performance and decent battery life. Fast delivery and nice packaging. Satisfied with overall experience.</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Waste of money</div>
+    <div class="rating">1 out of 5</div>
+    <div class="review-text">Bad experience. Broken on arrival and unusable. Cheap plastic parts and horrible quality. Returning it immediately.</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Outstanding performance</div>
+    <div class="rating">5 out of 5</div>
+    <div class="review-text">Amazing device! Exceeded my expectations. Beautiful design, super fast, and wonderful display. Best purchase of 2026!</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Average quality</div>
+    <div class="rating">3 out of 5</div>
+    <div class="review-text">The product is okay. Neither great nor terrible. Mediocre features for the price tag. Expected slightly better durability.</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Superb value</div>
+    <div class="rating">5 out of 5</div>
+    <div class="review-text">Terrific product for students and professionals. Extremely easy to set up and very reliable. Love the sleek aesthetics!</div>
+  </div>
+  <div class="review">
+    <div class="review-title">Faulty item</div>
+    <div class="rating">1 out of 5</div>
+    <div class="review-text">Awful quality and missing components. Worst online shopping experience. Totally useless and frustrating. Avoid at all costs!</div>
+  </div>
+</div>
+</body>
+</html>
+"""
+
 RUNNER_TEMPLATE = r'''
 import sys
 import os
@@ -148,7 +198,7 @@ class PythonExecutionHandler(http.server.BaseHTTPRequestHandler):
             
             # Check installed packages
             packages = []
-            for pkg in ['numpy', 'pandas', 'matplotlib', 'seaborn', 'scipy', 'requests', 'openpyxl']:
+            for pkg in ['numpy', 'pandas', 'matplotlib', 'seaborn', 'scipy', 'requests', 'openpyxl', 'bs4', 'nltk', 'vaderSentiment', 'wordcloud']:
                 try:
                     __import__(pkg)
                     packages.append(pkg)
@@ -249,6 +299,25 @@ class PythonExecutionHandler(http.server.BaseHTTPRequestHandler):
             csv_path = os.path.join(tmpdir, "students.csv")
             with open(csv_path, "w", encoding="utf-8") as f:
                 f.write(SAMPLE_CSV_CONTENT)
+
+            # Provision reviews.html for scraping experiment
+            reviews_html_path = os.path.join(tmpdir, "reviews.html")
+            with open(reviews_html_path, "w", encoding="utf-8") as f:
+                f.write(SAMPLE_REVIEWS_HTML)
+
+            # Copy cached iris.csv into tmpdir for instant offline 1A loading
+            local_iris = os.path.join(os.path.dirname(__file__), "iris.csv")
+            if os.path.exists(local_iris):
+                with open(local_iris, "r", encoding="utf-8") as src_f:
+                    with open(os.path.join(tmpdir, "iris.csv"), "w", encoding="utf-8") as dst_f:
+                        dst_f.write(src_f.read())
+
+            # Provide wordcloud fallback module in tmpdir
+            local_wc = os.path.join(os.path.dirname(__file__), "wordcloud.py")
+            if os.path.exists(local_wc):
+                with open(local_wc, "r", encoding="utf-8") as src_f:
+                    with open(os.path.join(tmpdir, "wordcloud.py"), "w", encoding="utf-8") as dst_f:
+                        dst_f.write(src_f.read())
 
             # Prepare runner script
             # Escaping code safely

@@ -1,49 +1,43 @@
-web site link: https://ds-lab-website-u2ut.onrender.com
+# DS Lab — Version 13
 
-# Data Science Digital Library
+## Start the website
 
-The **Data Science Digital Library** is a web-based learning platform developed to help students learn Data Science concepts, access study materials, practice programming, and explore technical resources in one place. It provides an organized and interactive environment that combines theoretical learning with practical experimentation.
+1. Extract the ZIP archive.
+2. Open the extracted folder in VS Code.
+3. In a terminal, run:
 
-## Features
+   ```powershell
+   npm.cmd install
+   npm.cmd run dev:full
+   ```
 
-**Modules:** The platform contains five Data Science modules: Introduction to Data Science, Data Extraction, Plotting and Visualization, Statistical Thinking, and Time Series Analysis and Predictive Modeling. Each module includes a description and its corresponding PDF for learning and reference. Users can read the original PDF or access the flipbook feature for an interactive digital reading experience.
+4. Open the local URL shown by Vite (usually `http://localhost:5173`).
 
-**Experiments:** The platform includes seven laboratory experiments with descriptions, explanations, and programming examples. Students can explore the source code, use the **Try Yourself** feature to modify programs, and execute supported code to view the output. These features encourage hands-on learning and help students understand programming concepts through practical implementation.
+## Save website edits to the project folder
 
-**Tools:** The Tools section provides information about useful programming languages, libraries, development environments, and resources related to Data Science. It helps students discover technologies that support coding, data analysis, visualization, and software development.
+The full launcher starts both the Python execution server and Vite:
 
-**Projects:** The Projects section showcases technical projects, including their descriptions, objectives, technologies used, and functionality. It provides a space to explore practical implementations and understand how programming and Data Science concepts can be applied to real-world problems.
+```powershell
+py -m pip install -r server\requirements.txt
+py server\server.py
+```
 
-**Portfolio:** The Portfolio section presents technical skills, academic projects, achievements, and professional information. It helps showcase learning progress, technical experience, and areas of interest in a structured format.
+If you start Vite manually with `npm.cmd run dev`, start the Python server in a second terminal using the command above. The **Run Code** button requires the Python server at `http://localhost:5050`.
 
-## Technologies and Tools Used
+When the server is running, edits made through the website (profile, modules, experiments, projects, theme, and tools content) are saved to:
 
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Backend:** Python
-- **PDF Rendering:** PDF.js
-- **Flipbook Animation:** StPageFlip or the page-flipping library configured in the project
-- **Data Science Libraries:** NumPy, Pandas, Matplotlib, Seaborn, Scikit-learn
-- **Package Management:** npm, pip
-- **Development Environment:** Visual Studio Code
-- **Version Control:** Git and GitHub
-- **Runtime Environment:** Node.js and Python
-- **Browser:** Google Chrome and other modern web browsers
+```text
+server\data\site-state.json
+```
 
-## Project Objective
+The site loads this file again on startup, so changes are available after refreshing the browser or clearing browser storage. If the server is not running, the site continues to use localStorage as an offline fallback. The JSON file is created automatically after the first successful save.
 
-The main objective of the Data Science Digital Library is to create a centralized digital learning environment where students can study module materials, practice laboratory programs, explore technical tools, discover projects, and showcase their skills. By bringing these resources together, the platform aims to make learning more accessible, organized, interactive, and practical.
+## Version 14 updates
 
-## Author
+- Tools opens a responsive grid of eight Data Science platform cards. Selecting a card opens that platform's official website in a new browser tab.
+- Uploaded module PDFs continue to open in the in-site PDF reader, now with a paper/book treatment and page-turn animation plus Previous/Next controls.
+- The student ID card's View More action opens a full-page portfolio inside DS Lab, with education, technical skills, leadership activities, contact links, and the Stock Day Tracker and CivicConnect projects.
+- Website changes are synchronized to `server\data\site-state.json` through the local backend.
+- Existing modules, experiments, project management, theme, and backend structure are retained.
 
-**B. Saranya**  
-B.Tech – Computer Science and Engineering (Data Science)  
-Mohan Babu University
-
-## GitHub Repository
-
-[Data Science Digital Library](https://github.com/bapathisharanya28/ds-lab-website)
-
----------------------------------------------------------|
-website link:https://ds-lab-website-u2ut.onrender.com    |
----------------------------------------------------------|
-*Built to support interactive learning, practical experimentation, and project-based exploration in Data Science.*
+Note: the server is intentionally local. A browser cannot directly rewrite JavaScript source files, so editable website data is stored in the project-local JSON state file instead of modifying bundled source code.

@@ -8,21 +8,21 @@ import idCardPhoto from '../assets/id-card-photo.jpeg';
 const LEGACY_DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400";
 
 export const INITIAL_STUDENT_PROFILE = {
-  name: "B Saranya",
+  name: "BAPATHI SARANYA",
   role: "Data Science Student",
-  course: "B.Tech — Computer Science & Engineering (Data Science)",
-  rollNo: "",
+  course: "Bachelore-CSEDS",
+  rollNo: "24102A030008",
   subject: "Data Science Laboratory",
   university: "Mohan Babu University",
-  faculty: "",
+  faculty: "S.BosuBabu",
   avatar: idCardPhoto,
   linkedIn: "https://www.linkedin.com/in/saranya-bapathi-b10b97370",
   github: "https://github.com/bapathisharanya28",
   email: "bapathisharanyareddy@gmail.com",
   semester: "2026",
-  batch: "",
+  batch: "2024-2025",
   branch: "CSE (DS)",
-  section: "",
+  section: "DS-1",
   resume: null
 };
 
@@ -125,10 +125,17 @@ export const INITIAL_MODULES = [
 ];
 
 const csvCode = `import pandas as pd
+import os
 
-# 1A.1 - Read an online CSV file
+# 1A.1 - Read CSV file (cached locally for instant loading, with online fallback)
 url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
-df = pd.read_csv(url)
+if os.path.exists("iris.csv"):
+    df = pd.read_csv("iris.csv")
+else:
+    try:
+        df = pd.read_csv(url)
+    except Exception:
+        df = pd.read_csv("students.csv")
 print("First five rows of the dataset:")
 print(df.head())
 print("\\nDataset Information:")
@@ -538,6 +545,365 @@ print(df.groupby("species")["petal_width"].mean())
 print("\\nMaximum sepal length by species:")
 print(df.groupby("species")["sepal_length"].max())`;
 
+const exp8a = `from bs4 import BeautifulSoup
+import pandas as pd
+import os
+
+# Experiment 8A: Web Scraping Product Reviews using Beautiful Soup
+# Reads authorized/saved reviews.html and extracts title, review text, and rating
+
+html_file = "reviews.html"
+if not os.path.exists(html_file):
+    print("reviews.html not found, using default sample HTML.")
+    html_content = \"\"\"<div class="review">
+        <div class="review-title">Great product</div>
+        <div class="rating">5 out of 5</div>
+        <div class="review-text">Excellent quality! Works like a charm and very durable. I am extremely satisfied with this purchase.</div>
+    </div>
+    <div class="review">
+        <div class="review-title">Not satisfied</div>
+        <div class="rating">2 out of 5</div>
+        <div class="review-text">The product stopped working after three days. Very poor build and terrible customer service.</div>
+    </div>
+    <div class="review">
+        <div class="review-title">Worth buying</div>
+        <div class="rating">4 out of 5</div>
+        <div class="review-text">Good performance and decent battery life. Fast delivery and nice packaging. Satisfied!</div>
+    </div>\"\"\"
+else:
+    with open(html_file, "r", encoding="utf-8") as file:
+        html_content = file.read()
+
+soup = BeautifulSoup(html_content, "html.parser")
+review_blocks = soup.select(".review")
+
+records = []
+for block in review_blocks:
+    review_element = block.select_one(".review-text")
+    rating_element = block.select_one(".rating")
+    title_element = block.select_one(".review-title")
+
+    review_text = review_element.get_text(" ", strip=True) if review_element else ""
+    rating_text = rating_element.get_text(" ", strip=True) if rating_element else ""
+    title = title_element.get_text(" ", strip=True) if title_element else ""
+
+    if review_text:
+        records.append({
+            "title": title,
+            "review": review_text,
+            "rating": rating_text
+        })
+
+df = pd.DataFrame(records)
+df.to_csv("product_reviews.csv", index=False, encoding="utf-8-sig")
+
+print(df.head())
+print("\\nTotal reviews extracted:", len(df))
+print("Saved to product_reviews.csv")`;
+
+const exp8bi = `import pandas as pd
+import matplotlib.pyplot as plt
+import os
+try:
+    from wordcloud import WordCloud
+except ImportError:
+    from server.wordcloud import WordCloud
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+# Experiment 8B(i): WordCloud Generation for All, Positive, and Negative Reviews
+
+# Ensure product_reviews.csv exists
+if not os.path.exists("product_reviews.csv"):
+    df_init = pd.DataFrame({
+        "title": ["Great product", "Not satisfied", "Worth buying", "Waste of money", "Outstanding performance"],
+        "review": [
+            "Excellent quality! Works like a charm and very durable. Extremely satisfied.",
+            "The product stopped working after three days. Very poor build and terrible customer service.",
+            "Good performance and decent battery life. Fast delivery and nice packaging.",
+            "Bad experience. Broken on arrival and unusable. Cheap plastic parts.",
+            "Amazing device! Exceeded my expectations. Beautiful design, super fast, and wonderful display."
+        ],
+        "rating": ["5 out of 5", "2 out of 5", "4 out of 5", "1 out of 5", "5 out of 5"]
+    })
+    df_init.to_csv("product_reviews.csv", index=False)
+
+df = pd.read_csv("product_reviews.csv")
+df["review"] = df["review"].fillna("").astype(str)
+
+analyzer = SentimentIntensityAnalyzer()
+
+def classify_sentiment(text):
+    score = analyzer.polarity_scores(text)["compound"]
+    if score >= 0.05:
+        return "Positive"
+    elif score <= -0.05:
+        return "Negative"
+    return "Neutral"
+
+df["sentiment"] = df["review"].apply(classify_sentiment)
+
+def generate_wordcloud(text, title, filename):
+    if not text.strip():
+        print(f"No text available for: {title}")
+        return
+
+    cloud = WordCloud(
+        width=1200,
+        height=600,
+        background_color="white",
+        max_words=150,
+        collocations=False
+    ).generate(text)
+    
+    plt.figure(figsize=(12, 6))
+    plt.imshow(cloud, interpolation="bilinear")
+    plt.axis("off")
+    plt.title(title, fontsize=16, fontweight="bold", pad=12)
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300, bbox_inches="tight")
+    plt.show()
+
+# 1. All reviews
+all_text = " ".join(df["review"])
+generate_wordcloud(all_text, "WordCloud - All Reviews", "wordcloud_all.png")
+
+# 2. Positive reviews
+positive_text = " ".join(df.loc[df["sentiment"] == "Positive", "review"])
+generate_wordcloud(positive_text, "WordCloud - Positive Reviews", "wordcloud_positive.png")
+
+# 3. Negative reviews
+negative_text = " ".join(df.loc[df["sentiment"] == "Negative", "review"])
+generate_wordcloud(negative_text, "WordCloud - Negative Reviews", "wordcloud_negative.png")
+
+df.to_csv("product_reviews_analyzed.csv", index=False)
+print("Sentiment counts:")
+print(df["sentiment"].value_counts())
+print("WordCloud images saved successfully.")`;
+
+const exp8bii = `import re
+import pandas as pd
+import nltk
+import matplotlib.pyplot as plt
+import seaborn as sns
+from nltk.corpus import stopwords
+from collections import Counter
+import os
+
+# Experiment 8B(ii): Distribution of Stopwords, Numerics, Word Count, Character Count, and Avg Word Length
+
+nltk.download("stopwords", quiet=True)
+
+if not os.path.exists("product_reviews.csv"):
+    df_init = pd.DataFrame({
+        "title": ["Great product", "Not satisfied", "Worth buying"],
+        "review": [
+            "Excellent quality with 10 days battery life and 100 percent satisfaction.",
+            "Defective 2 items received out of 5 ordered. Completely broken.",
+            "Good value for 2026. Highly recommended!"
+        ],
+        "rating": ["5 out of 5", "1 out of 5", "4 out of 5"]
+    })
+    df_init.to_csv("product_reviews.csv", index=False)
+
+df = pd.read_csv("product_reviews.csv")
+df["review"] = df["review"].fillna("").astype(str)
+
+stop_words = set(stopwords.words("english"))
+
+def analyze_review(text):
+    tokens = re.findall(r"\\b[\\w']+\\b", text.lower())
+    words = re.findall(r"\\b[A-Za-z]+\\b", text)
+    numeric_tokens = re.findall(r"\\b\\d+(?:\\.\\d+)?\\b", text)
+
+    stopword_tokens = [token for token in tokens if token in stop_words]
+
+    return pd.Series({
+        "word_count": len(tokens),
+        "character_count": len(text),
+        "numeric_count": len(numeric_tokens),
+        "stopword_count": len(stopword_tokens),
+        "average_word_length": (
+            sum(len(word) for word in words) / len(words)
+            if words else 0
+        )
+    })
+
+statistics = df["review"].apply(analyze_review)
+df = pd.concat([df, statistics], axis=1)
+
+df.to_csv("review_statistics.csv", index=False)
+
+columns = [
+    ("stopword_count", "Stopword Count"),
+    ("numeric_count", "Numeric Token Count"),
+    ("word_count", "Word Count"),
+    ("character_count", "Character Count"),
+    ("average_word_length", "Average Word Length")
+]
+
+fig, axes = plt.subplots(3, 2, figsize=(14, 15))
+axes = axes.flatten()
+
+for i, (column, title) in enumerate(columns):
+    sns.histplot(data=df, x=column, kde=True, ax=axes[i], bins=15, color="#7c3aed")
+    axes[i].set_title(title, fontweight="bold")
+    axes[i].set_xlabel(title)
+    axes[i].set_ylabel("Number of Reviews")
+
+axes[-1].axis("off")
+plt.tight_layout()
+plt.savefig("review_statistics_distributions.png", dpi=300)
+plt.show()
+
+all_tokens = re.findall(r"\\b[\\w']+\\b", " ".join(df["review"]).lower())
+stopword_frequency = Counter(token for token in all_tokens if token in stop_words)
+
+print("Top 10 stopwords:")
+print(stopword_frequency.most_common(10))
+
+print("\\nDescriptive statistics:")
+print(df[[
+    "stopword_count",
+    "numeric_count",
+    "word_count",
+    "character_count",
+    "average_word_length"
+]].describe())`;
+
+const exp8biii = `import pandas as pd
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as NLTKVADER
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as StandaloneVADER
+import os
+
+# Experiment 8B(iii): Display Sentiment Values Using NLTK and VADER
+
+nltk.download("vader_lexicon", quiet=True)
+
+if not os.path.exists("product_reviews.csv"):
+    df_init = pd.DataFrame({
+        "title": ["Great", "Bad", "Okay"],
+        "review": ["The product is excellent.", "The quality is terrible.", "The product is okay."],
+        "rating": ["5 out of 5", "1 out of 5", "3 out of 5"]
+    })
+    df_init.to_csv("product_reviews.csv", index=False)
+
+df = pd.read_csv("product_reviews.csv")
+df["review"] = df["review"].fillna("").astype(str)
+
+nltk_analyzer = NLTKVADER()
+vader_analyzer = StandaloneVADER()
+
+def classify(score):
+    if score >= 0.05:
+        return "Positive"
+    elif score <= -0.05:
+        return "Negative"
+    return "Neutral"
+
+# NLTK VADER scores
+nltk_scores = df["review"].apply(nltk_analyzer.polarity_scores)
+df["nltk_positive"] = nltk_scores.apply(lambda x: x["pos"])
+df["nltk_negative"] = nltk_scores.apply(lambda x: x["neg"])
+df["nltk_neutral"] = nltk_scores.apply(lambda x: x["neu"])
+df["nltk_compound"] = nltk_scores.apply(lambda x: x["compound"])
+
+# Standalone VADER scores
+vader_scores = df["review"].apply(vader_analyzer.polarity_scores)
+df["vader_positive"] = vader_scores.apply(lambda x: x["pos"])
+df["vader_negative"] = vader_scores.apply(lambda x: x["neg"])
+df["vader_neutral"] = vader_scores.apply(lambda x: x["neu"])
+df["vader_compound"] = vader_scores.apply(lambda x: x["compound"])
+
+df["nltk_sentiment"] = df["nltk_compound"].apply(classify)
+df["vader_sentiment"] = df["vader_compound"].apply(classify)
+
+# Display sample results
+print(df[[
+    "review",
+    "nltk_compound",
+    "nltk_sentiment",
+    "vader_compound",
+    "vader_sentiment"
+]].head(10).to_string(index=False))
+
+print("\\nNLTK sentiment distribution:")
+print(df["nltk_sentiment"].value_counts())
+
+print("\\nStandalone VADER sentiment distribution:")
+print(df["vader_sentiment"].value_counts())
+
+df.to_csv("sentiment_analysis_results.csv", index=False)
+print("\\nResults saved to sentiment_analysis_results.csv")`;
+
+const exp8biv = `import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# Experiment 8B(iv): Create Scatter Intensity Plot of Sentiments
+
+# Ensure sentiment_analysis_results.csv exists
+if not os.path.exists("sentiment_analysis_results.csv"):
+    df_seed = pd.DataFrame({
+        "review": [
+            "Excellent quality! Highly recommended.",
+            "The product stopped working after 3 days. Terrible.",
+            "Good performance and fast delivery.",
+            "Broken on arrival, waste of money.",
+            "Super fast, wonderful display, loved it!",
+            "Mediocre quality, expected better.",
+            "Terrific value for money.",
+            "Worst online shopping experience ever."
+        ],
+        "vader_compound": [0.82, -0.65, 0.74, -0.71, 0.88, -0.15, 0.68, -0.78],
+        "vader_sentiment": ["Positive", "Negative", "Positive", "Negative", "Positive", "Negative", "Positive", "Negative"]
+    })
+    df_seed.to_csv("sentiment_analysis_results.csv", index=False)
+
+df = pd.read_csv("sentiment_analysis_results.csv")
+
+df["vader_compound"] = pd.to_numeric(df["vader_compound"], errors="coerce")
+df = df.dropna(subset=["vader_compound"]).reset_index(drop=True)
+
+df["review_index"] = range(1, len(df) + 1)
+
+palette = {
+    "Positive": "green",
+    "Negative": "red",
+    "Neutral": "gray"
+}
+
+plt.figure(figsize=(14, 7))
+
+sns.scatterplot(
+    data=df,
+    x="review_index",
+    y="vader_compound",
+    hue="vader_sentiment",
+    palette=palette,
+    s=85,
+    alpha=0.85
+)
+
+# Sentiment classification thresholds
+plt.axhline(y=0.05, color="green", linestyle="--", label="Positive threshold (0.05)")
+plt.axhline(y=-0.05, color="red", linestyle="--", label="Negative threshold (-0.05)")
+plt.axhline(y=0, color="black", linestyle=":", label="Neutral reference (0.0)")
+
+plt.ylim(-1.05, 1.05)
+plt.xlabel("Review Index", fontsize=12, fontweight="bold")
+plt.ylabel("VADER Compound Sentiment Score", fontsize=12, fontweight="bold")
+plt.title("Sentiment Intensity Scatter Plot of Product Reviews", fontsize=15, fontweight="bold", pad=12)
+plt.legend(loc="best")
+plt.grid(alpha=0.25)
+plt.tight_layout()
+
+plt.savefig("sentiment_intensity_scatter.png", dpi=300)
+plt.show()
+
+print("Scatter intensity plot saved successfully as sentiment_intensity_scatter.png.")`;
+
 function sub(id,name,description,code,technologies){return {id,name,description,code,output:"",outputImages:[],technologies,date:"2026",status:"Published"}}
 export const INITIAL_EXPERIMENTS = [
   {id:1,number:1,name:"Working with Different Data Formats using Pandas",description:"A practical exploration of CSV, JSON, and Excel data handling with Pandas, including reading, writing, parsing, and working with multiple sheets.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas"],code:"",output:"",outputImages:[],subExperiments:[sub("1A","CSV File Handling","Read an online CSV dataset, write CSV output, and work with tab-delimited student data.",csvCode,["Python","Pandas","CSV"]),sub("1B","JSON File Handling","Create JSON records, read JSON files, parse JSON text, and consume JSON data from an API.",jsonCode,["Python","Pandas","JSON","API"]),sub("1C","Excel File Handling","Write and read Excel files, create multiple worksheets, and load all sheets with Pandas.",excelCode,["Python","Pandas","Excel","OpenPyXL"])]},
@@ -546,7 +912,15 @@ export const INITIAL_EXPERIMENTS = [
   {id:4,number:4,name:"Advanced Pandas Operations",description:"Explore hierarchical indexing, reshaping with stack and unstack, and combining complementary DataFrames with Pandas.",coverImage:"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","NumPy"],code:"",output:"",outputImages:[],subExperiments:[sub("4A","MultiIndex Series","Create and query a hierarchical Pandas Series using two index levels.",exp4a,["Python","Pandas","NumPy"]),sub("4B","Stack and Unstack","Reshape a MultiIndex Series into a DataFrame and stack it back into a Series.",exp4b,["Python","Pandas","NumPy"]),sub("4C","Combine First","Fill missing values in one DataFrame using values from another DataFrame.",exp4c,["Python","Pandas","NumPy"])]},
   {id:5,number:5,name:"Data Visualization with Matplotlib and Seaborn",description:"Create common analytical plots including line, bar, histogram, scatter, and box plots and view the generated figures directly in the lab.",coverImage:"https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Matplotlib","Seaborn"],code:"",output:"",outputImages:[],subExperiments:[sub("5A","Line Plot","Create a simple line chart with labels, title, and grid.",exp5a,["Python","Matplotlib"]),sub("5B","Bar Plot","Compare categorical values using a Pandas bar plot.",exp5b,["Python","Pandas","Matplotlib"]),sub("5C","Histogram and Density Plot","Visualize a random distribution with a histogram and KDE curve.",exp5c,["Python","Seaborn","Matplotlib"]),sub("5D","Scatter Plot","Visualize the relationship between two random numerical variables.",exp5d,["Python","NumPy","Matplotlib"]),sub("5E","Box Plot","Summarize distributions across multiple variables with a Seaborn box plot.",exp5e,["Python","Seaborn","Matplotlib"])]},
   {id:6,number:6,name:"Time Series Analysis",description:"Create and manipulate timestamp-indexed data, generate date ranges, work with time zones and periods, convert periods and timestamps between frequencies, and perform resampling, downsampling, and upsampling.",coverImage:"https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","Time Series"],code:"",output:"",outputImages:[],subExperiments:[sub("6A","Create a Time Series Using Datetime Objects","Create a Pandas Series indexed by timestamps.",exp6a,["Python","Pandas","Datetime"]),sub("6B","Generate Date Ranges and Work with Time Zones","Generate timestamps, localize a timezone, convert to another timezone, and combine timezone-aware series.",exp6b,["Python","Pandas","Timezone"]),sub("6C","Period Arithmetic and Period Ranges","Add and subtract integers from Period objects and create a range using period_range().",exp6c,["Python","Pandas","Period"]),sub("6D","Basic Time Series Resampling","Resample time-series observations and calculate monthly mean values.",exp6d,["Python","Pandas","Resampling"]),sub("6E","Convert Periods and PeriodIndex to Another Frequency","Use asfreq() to convert Period and PeriodIndex objects to another frequency, selecting the start or end of each period.",exp6e,["Python","Pandas","PeriodIndex","asfreq()"]),sub("6F","Convert Timestamp-Indexed Series and DataFrames to Periods","Use to_period() to convert timestamp indexes in Series and DataFrames into periods.",exp6f,["Python","Pandas","Series","DataFrame","to_period()"]),sub("6G","Resampling, Downsampling, and Upsampling","Resample hourly data, aggregate larger intervals, and upsample to 30-minute intervals with optional forward filling.",exp6g,["Python","Pandas","Resampling","Time Series"])]},
-  {id:7,number:7,name:"Data Aggregation",description:"Group tabular data using single or multiple keys, calculate grouped summary statistics, and perform exploratory data analysis on an online dataset.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","GroupBy","Aggregation","EDA"],code:"",output:"",outputImages:[],subExperiments:[sub("7A","Group Data Using Single and Multiple Keys","Create a DataFrame, group records by one or multiple keys, select groups, and calculate average marks.",exp7a,["Python","Pandas","DataFrame","groupby()"]),sub("7B","Compute Summary Statistics Using Aggregation","Calculate sum, mean, and standard deviation for Marks and Attendance grouped by department.",exp7b,["Python","Pandas","aggregate()","Statistics"]),sub("7C","GroupBy and Exploratory Data Analysis on an Online Dataset","Load the online Iris dataset, inspect and summarize it, group by one or multiple columns, and calculate species-level statistics.",exp7c,["Python","Pandas","Online Dataset","GroupBy","EDA"])]}];
+  {id:7,number:7,name:"Data Aggregation",description:"Group tabular data using single or multiple keys, calculate grouped summary statistics, and perform exploratory data analysis on an online dataset.",coverImage:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","Pandas","GroupBy","Aggregation","EDA"],code:"",output:"",outputImages:[],subExperiments:[sub("7A","Group Data Using Single and Multiple Keys","Create a DataFrame, group records by one or multiple keys, select groups, and calculate average marks.",exp7a,["Python","Pandas","DataFrame","groupby()"]),sub("7B","Compute Summary Statistics Using Aggregation","Calculate sum, mean, and standard deviation for Marks and Attendance grouped by department.",exp7b,["Python","Pandas","aggregate()","Statistics"]),sub("7C","GroupBy and Exploratory Data Analysis on an Online Dataset","Load the online Iris dataset, inspect and summarize it, group by one or multiple columns, and calculate species-level statistics.",exp7c,["Python","Pandas","Online Dataset","GroupBy","EDA"])]},
+  {id:8,number:8,name:"Web Scraping and Exploratory Data Analysis of Product Reviews",description:"Extract product reviews from web pages using Beautiful Soup, perform NLP text analysis, generate WordClouds for positive and negative reviews, compute text statistics distributions, and perform VADER sentiment analysis.",coverImage:"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80",date:"2026",status:"Published",technologies:["Python","BeautifulSoup4","NLTK","VADER","WordCloud","Pandas","Seaborn"],code:"",output:"",outputImages:[],subExperiments:[
+    sub("8A","Extract Product Reviews with Beautiful Soup","Extract customer review titles, bodies, and ratings from an authorized HTML source using Beautiful Soup and save to CSV.",exp8a,["Python","BeautifulSoup4","Pandas","Web Scraping"]),
+    sub("8B(i)","WordCloud Analysis for Reviews","Classify reviews using VADER compound polarity and generate WordCloud visualizations for all, positive, and negative reviews.",exp8bi,["Python","WordCloud","VADER","Matplotlib"]),
+    sub("8B(ii)","Text Statistics and Distributions","Calculate stopword count, numeric count, word count, character count, and average word length, and plot their frequency distributions.",exp8bii,["Python","NLTK","Seaborn","Regex","Statistics"]),
+    sub("8B(iii)","Sentiment Analysis using NLTK and VADER","Calculate positive, negative, neutral, and compound scores and compare sentiment categories using NLTK VADER and standalone VADER.",exp8biii,["Python","NLTK","VADER","Sentiment Analysis"]),
+    sub("8B(iv)","Scatter Intensity Plot of Sentiments","Visualize the distribution and strength of review sentiments across the dataset with horizontal threshold boundaries.",exp8biv,["Python","Seaborn","Matplotlib","Data Visualization"])
+  ]}
+];
 
 export const INITIAL_PROJECTS = [
   {
@@ -613,7 +987,7 @@ export const INITIAL_PROJECTS = [
   }
 ];
 
-export const DATA_VERSION = "ds-syllabus-v6";
+export const DATA_VERSION = "ds-syllabus-v8";
 const STORAGE_KEYS = { 
   PROFILE: "ds_lab_profile", 
   MODULES: "ds_lab_modules", 

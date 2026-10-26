@@ -1,20 +1,20 @@
 {
   "profile": {
-    "name": "B Saranya",
+    "name": "BAPATHI SARANYA",
     "role": "Data Science Student",
-    "course": "B.Tech — Computer Science & Engineering (Data Science)",
-    "rollNo": "",
+    "course": "Bachelore-CSEDS",
+    "rollNo": "24102A030008",
     "subject": "Data Science Laboratory",
     "university": "Mohan Babu University",
-    "faculty": "",
-    "avatar": "/src/assets/id-card-photo.jpeg",
+    "faculty": "S.BosuBabu",
+    "avatar": "",
     "linkedIn": "https://www.linkedin.com/in/saranya-bapathi-b10b97370",
     "github": "https://github.com/bapathisharanya28",
     "email": "bapathisharanyareddy@gmail.com",
     "semester": "2026",
-    "batch": "",
+    "batch": "2024-2025",
     "branch": "CSE (DS)",
-    "section": "",
+    "section": "DS-1",
     "resume": null
   },
   "modules": [
@@ -231,7 +231,7 @@
           "id": "1A",
           "name": "CSV File Handling",
           "description": "Read an online CSV dataset, write CSV output, and work with tab-delimited student data.",
-          "code": "import pandas as pd\n\n# 1A.1 - Read an online CSV file\nurl = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv\"\ndf = pd.read_csv(url)\nprint(\"First five rows of the dataset:\")\nprint(df.head())\nprint(\"\\nDataset Information:\")\nprint(df.info())\nprint(\"\\nNumber of rows and columns:\")\nprint(df.shape)\n\n# 1A.2 - Write the DataFrame to CSV\noutput_file = \"iris_output.csv\"\ndf.to_csv(output_file, index=False)\nprint(f\"\\nThe dataset has been successfully written to {output_file}\")\n\n# 1A.3 - Create a tab-delimited student file, then read it\nstudent_data = {\n    \"Roll_No\": [101, 102, 103, 104],\n    \"Name\": [\"Anusha\", \"Babitha\", \"Charitha\", \"Deepika\"],\n    \"Department\": [\"IT\", \"IT\", \"CSE\", \"ECE\"],\n    \"Percentage\": [89, 92, 88, 85]\n}\nstudent_df = pd.DataFrame(student_data)\nstudent_df.to_csv(\"students.txt\", sep=\"\\t\", index=False)\nprint(\"\\nData successfully written to students.txt\")\n\nprint(\"\\nStudent data read from the tab-delimited file:\")\nprint(pd.read_csv(\"students.txt\", sep=\"\\t\"))",
+          "code": "import pandas as pd\nimport os\n\n# 1A.1 - Read CSV file (cached locally for instant loading, with online fallback)\nurl = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv\"\nif os.path.exists(\"iris.csv\"):\n    df = pd.read_csv(\"iris.csv\")\nelse:\n    try:\n        df = pd.read_csv(url)\n    except Exception:\n        df = pd.read_csv(\"students.csv\")\nprint(\"First five rows of the dataset:\")\nprint(df.head())\nprint(\"\\nDataset Information:\")\nprint(df.info())\nprint(\"\\nNumber of rows and columns:\")\nprint(df.shape)\n\n# 1A.2 - Write the DataFrame to CSV\noutput_file = \"iris_output.csv\"\ndf.to_csv(output_file, index=False)\nprint(f\"\\nThe dataset has been successfully written to {output_file}\")\n\n# 1A.3 - Create a tab-delimited student file, then read it\nstudent_data = {\n    \"Roll_No\": [101, 102, 103, 104],\n    \"Name\": [\"Anusha\", \"Babitha\", \"Charitha\", \"Deepika\"],\n    \"Department\": [\"IT\", \"IT\", \"CSE\", \"ECE\"],\n    \"Percentage\": [89, 92, 88, 85]\n}\nstudent_df = pd.DataFrame(student_data)\nstudent_df.to_csv(\"students.txt\", sep=\"\\t\", index=False)\nprint(\"\\nData successfully written to students.txt\")\n\nprint(\"\\nStudent data read from the tab-delimited file:\")\nprint(pd.read_csv(\"students.txt\", sep=\"\\t\"))",
           "output": "",
           "outputImages": [],
           "technologies": [
@@ -566,8 +566,8 @@
     {
       "id": 6,
       "number": 6,
-      "name": "Time Series and Date-Time Operations",
-      "description": "Work with date ranges, timestamps, timezone conversion, quarterly periods, and resampling of time-series data using Pandas.",
+      "name": "Time Series Analysis",
+      "description": "Create and manipulate timestamp-indexed data, generate date ranges, work with time zones and periods, convert periods and timestamps between frequencies, and perform resampling, downsampling, and upsampling.",
       "coverImage": "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1400&q=80",
       "date": "2026",
       "status": "Published",
@@ -582,24 +582,23 @@
       "subExperiments": [
         {
           "id": "6A",
-          "name": "Date Range and Time Series",
-          "description": "Create a daily date range and attach random observations to a DatetimeIndex.",
+          "name": "Create a Time Series Using Datetime Objects",
+          "description": "Create a Pandas Series indexed by timestamps.",
           "code": "import pandas as pd\nimport numpy as np\n\nrng = pd.date_range(\"2023-01-01\", periods=6, freq=\"D\")\nts = pd.Series(np.random.randn(len(rng)), index=rng)\nprint(ts)",
           "output": "",
           "outputImages": [],
           "technologies": [
             "Python",
             "Pandas",
-            "NumPy"
+            "Datetime"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         },
         {
           "id": "6B",
-          "name": "Timezone Conversion",
-          "description": "Localize a timestamp to UTC and convert it to Asia/Kolkata time.",
+          "name": "Generate Date Ranges and Work with Time Zones",
+          "description": "Generate timestamps, localize a timezone, convert to another timezone, and combine timezone-aware series.",
           "code": "import pandas as pd\n\nts = pd.Timestamp.now()\nts_utc = ts.tz_localize(\"UTC\")\nts_ind = ts_utc.tz_convert(\"Asia/Kolkata\")\nprint(\"India time:\")\nprint(ts_ind)",
           "output": "",
           "outputImages": [],
@@ -609,13 +608,12 @@
             "Timezone"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         },
         {
           "id": "6C",
-          "name": "Period Operations",
-          "description": "Perform arithmetic on a quarterly Period and convert it to month-end frequency.",
+          "name": "Period Arithmetic and Period Ranges",
+          "description": "Add and subtract integers from Period objects and create a range using period_range().",
           "code": "import pandas as pd\n\np = pd.Period(\"2024Q1\")\nprint(\"Next period:\")\nprint(p + 1)\nprint(\"Quarter converted to month-end frequency:\")\nprint(p.asfreq(\"M\", \"end\"))",
           "output": "",
           "outputImages": [],
@@ -625,14 +623,13 @@
             "Period"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         },
         {
           "id": "6D",
-          "name": "Time Series Resampling",
-          "description": "Resample daily observations to monthly mean values.",
-          "code": "import pandas as pd\nimport numpy as np\n\nts = pd.Series(\n    np.random.randn(100),\n    index=pd.date_range(\"2024-01-01\", periods=100)\n)\nts_monthly = ts.resample(\"ME\").mean()\nprint(\"Monthly mean values:\")\nprint(ts_monthly)",
+          "name": "Basic Time Series Resampling",
+          "description": "Resample time-series observations and calculate monthly mean values.",
+          "code": "import pandas as pd\nimport numpy as np\n\nts = pd.Series(\n    np.random.randn(100),\n    index=pd.date_range(\"2024-01-01\", periods=100)\n)\n# Use 'ME' (month-end) frequency for modern Pandas\nts_monthly = ts.resample(\"ME\").mean()\nprint(\"Monthly mean values:\")\nprint(ts_monthly)",
           "output": "",
           "outputImages": [],
           "technologies": [
@@ -641,34 +638,40 @@
             "Resampling"
           ],
           "date": "2026",
-          "status": "Published",
-          "isRunning": false
+          "status": "Published"
         },
         {
           "id": "6E",
-          "name": "Convert Periods and Periodlndex objects to another frequency",
-          "description": "The asfreq() method in Pandas converts Period and PeriodIndex objects from one frequency to another, such as converting monthly periods into daily or yearly periods. It helps analyze time-series data at different time intervals. The freq parameter specifies the target frequency, and the how parameter ('start' or 'end') determines whether to select the beginning or end of the original period when converting to a lower frequency.",
-          "code": "import pandas as pd\n\n# 1. Create a monthly Period\np = pd.Period(\"2026-01\", freq=\"M\")\nprint(\"Original monthly period:\")\nprint(p)\n\n# 2. Convert monthly Period to daily frequency\nprint(\"\\nMonthly to daily (start):\")\nprint(p.asfreq(\"D\", how=\"start\"))\nprint(\"\\nMonthly to daily (end):\")\nprint(p.asfreq(\"D\", how=\"end\"))\n\n# 3. Create a PeriodIndex\nperiod_index = pd.period_range(start=\"2026-01\", periods=3, freq=\"M\")\nprint(\"\\nOriginal PeriodIndex:\")\nprint(period_index)\n\n# 4. Convert PeriodIndex to daily frequency\nprint(\"\\nPeriodIndex to daily (start):\")\nprint(period_index.asfreq(\"D\", how=\"start\"))\nprint(\"\\nPeriodIndex to daily (end):\")\nprint(period_index.asfreq(\"D\", how=\"end\"))",
+          "name": "Convert Periods and PeriodIndex to Another Frequency",
+          "description": "Use asfreq() to convert Period and PeriodIndex objects to another frequency, selecting the start or end of each period.",
+          "code": "import pandas as pd\n\np = pd.Period(\"2026-01\", freq=\"M\")\nprint(\"Original monthly period:\")\nprint(p)\nprint(\"\\nMonthly to daily (start):\")\nprint(p.asfreq(\"D\", how=\"start\"))\nprint(\"\\nMonthly to daily (end):\")\nprint(p.asfreq(\"D\", how=\"end\"))\n\nperiod_index = pd.period_range(start=\"2026-01\", periods=3, freq=\"M\")\nprint(\"\\nOriginal PeriodIndex:\")\nprint(period_index)\nprint(\"\\nPeriodIndex to daily (start):\")\nprint(period_index.asfreq(\"D\", how=\"start\"))\nprint(\"\\nPeriodIndex to daily (end):\")\nprint(period_index.asfreq(\"D\", how=\"end\"))",
           "output": "",
           "outputImages": [],
           "technologies": [
             "Python",
-            "Pandas"
+            "Pandas",
+            "PeriodIndex",
+            "asfreq()"
           ],
-          "isRunning": false
+          "date": "2026",
+          "status": "Published"
         },
         {
           "id": "6F",
-          "name": "Convert Series and DataFrame objects indexed by timestamps to periods",
-          "description": "The `to_period()` method in Pandas converts a Series or DataFrame index containing timestamps into a PeriodIndex, representing a specific time period such as a day, month, quarter, or year. It is useful for time-series analysis when data needs to be grouped or analyzed by periods rather than individual timestamps. The `freq` parameter specifies the required frequency, such as `'M'` for monthly or `'Y'` for yearly periods.",
-          "code": "import pandas as pd\n\n# 1. Create a Series with timestamp index\ndates = pd.to_datetime([\"2026-01-10\", \"2026-02-15\", \"2026-03-20\", \"2026-04-25\"])\nsales = pd.Series([1000, 1500, 1800, 2200], index=dates)\nprint(\"Original Series:\")\nprint(sales)\n\n# 2. Convert Series from timestamps to monthly periods\nprint(\"\\nSeries converted to monthly periods:\")\nprint(sales.to_period(\"M\"))\n\n# 3. Create a DataFrame with timestamp index\ndf = pd.DataFrame(\n    {\"Sales\": [1000, 1500, 1800, 2200], \"Profit\": [200, 300, 400, 500]},\n    index=dates\n)\nprint(\"\\nOriginal DataFrame:\")\nprint(df)\n\n# 4. Convert DataFrame to monthly periods\nprint(\"\\nDataFrame converted to monthly periods:\")\nprint(df.to_period(\"M\"))",
+          "name": "Convert Timestamp-Indexed Series and DataFrames to Periods",
+          "description": "Use to_period() to convert timestamp indexes in Series and DataFrames into periods.",
+          "code": "import pandas as pd\n\ndates = pd.to_datetime([\"2026-01-10\", \"2026-02-15\", \"2026-03-20\", \"2026-04-25\"])\nsales = pd.Series([1000, 1500, 1800, 2200], index=dates)\nprint(\"Original Series:\")\nprint(sales)\nprint(\"\\nSeries converted to monthly periods:\")\nprint(sales.to_period(\"M\"))\n\ndf = pd.DataFrame(\n    {\"Sales\": [1000, 1500, 1800, 2200], \"Profit\": [200, 300, 400, 500]},\n    index=dates\n)\nprint(\"\\nDataFrame converted to monthly periods:\")\nprint(df.to_period(\"M\"))",
           "output": "",
           "outputImages": [],
           "technologies": [
             "Python",
-            "Pandas"
+            "Pandas",
+            "Series",
+            "DataFrame",
+            "to_period()"
           ],
-          "isRunning": false
+          "date": "2026",
+          "status": "Published"
         },
         {
           "id": "6G",
@@ -752,6 +755,110 @@
             "Online Dataset",
             "GroupBy",
             "EDA"
+          ],
+          "date": "2026",
+          "status": "Published"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "number": 8,
+      "name": "Web Scraping and Exploratory Data Analysis of Product Reviews",
+      "description": "Extract product reviews from web pages using Beautiful Soup, perform NLP text analysis, generate WordClouds for positive and negative reviews, compute text statistics distributions, and perform VADER sentiment analysis.",
+      "coverImage": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80",
+      "date": "2026",
+      "status": "Published",
+      "technologies": [
+        "Python",
+        "BeautifulSoup4",
+        "NLTK",
+        "VADER",
+        "WordCloud",
+        "Pandas",
+        "Seaborn"
+      ],
+      "code": "",
+      "output": "",
+      "outputImages": [],
+      "subExperiments": [
+        {
+          "id": "8A",
+          "name": "Extract Product Reviews with Beautiful Soup",
+          "description": "Extract customer review titles, bodies, and ratings from an authorized HTML source using Beautiful Soup and save to CSV.",
+          "code": "from bs4 import BeautifulSoup\nimport pandas as pd\nimport os\n\n# Experiment 8A: Web Scraping Product Reviews using Beautiful Soup\n# Reads authorized/saved reviews.html and extracts title, review text, and rating\n\nhtml_file = \"reviews.html\"\nif not os.path.exists(html_file):\n    print(\"reviews.html not found, using default sample HTML.\")\n    html_content = \"\"\"<div class=\"review\">\n        <div class=\"review-title\">Great product</div>\n        <div class=\"rating\">5 out of 5</div>\n        <div class=\"review-text\">Excellent quality! Works like a charm and very durable. I am extremely satisfied with this purchase.</div>\n    </div>\n    <div class=\"review\">\n        <div class=\"review-title\">Not satisfied</div>\n        <div class=\"rating\">2 out of 5</div>\n        <div class=\"review-text\">The product stopped working after three days. Very poor build and terrible customer service.</div>\n    </div>\n    <div class=\"review\">\n        <div class=\"review-title\">Worth buying</div>\n        <div class=\"rating\">4 out of 5</div>\n        <div class=\"review-text\">Good performance and decent battery life. Fast delivery and nice packaging. Satisfied!</div>\n    </div>\"\"\"\nelse:\n    with open(html_file, \"r\", encoding=\"utf-8\") as file:\n        html_content = file.read()\n\nsoup = BeautifulSoup(html_content, \"html.parser\")\nreview_blocks = soup.select(\".review\")\n\nrecords = []\nfor block in review_blocks:\n    review_element = block.select_one(\".review-text\")\n    rating_element = block.select_one(\".rating\")\n    title_element = block.select_one(\".review-title\")\n\n    review_text = review_element.get_text(\" \", strip=True) if review_element else \"\"\n    rating_text = rating_element.get_text(\" \", strip=True) if rating_element else \"\"\n    title = title_element.get_text(\" \", strip=True) if title_element else \"\"\n\n    if review_text:\n        records.append({\n            \"title\": title,\n            \"review\": review_text,\n            \"rating\": rating_text\n        })\n\ndf = pd.DataFrame(records)\ndf.to_csv(\"product_reviews.csv\", index=False, encoding=\"utf-8-sig\")\n\nprint(df.head())\nprint(\"\\nTotal reviews extracted:\", len(df))\nprint(\"Saved to product_reviews.csv\")",
+          "output": "",
+          "outputImages": [],
+          "technologies": [
+            "Python",
+            "BeautifulSoup4",
+            "Pandas",
+            "Web Scraping"
+          ],
+          "date": "2026",
+          "status": "Published"
+        },
+        {
+          "id": "8B(i)",
+          "name": "WordCloud Analysis for Reviews",
+          "description": "Classify reviews using VADER compound polarity and generate WordCloud visualizations for all, positive, and negative reviews.",
+          "code": "import pandas as pd\nimport matplotlib.pyplot as plt\nimport os\ntry:\n    from wordcloud import WordCloud\nexcept ImportError:\n    from server.wordcloud import WordCloud\nfrom vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer\n\n# Experiment 8B(i): WordCloud Generation for All, Positive, and Negative Reviews\n\n# Ensure product_reviews.csv exists\nif not os.path.exists(\"product_reviews.csv\"):\n    df_init = pd.DataFrame({\n        \"title\": [\"Great product\", \"Not satisfied\", \"Worth buying\", \"Waste of money\", \"Outstanding performance\"],\n        \"review\": [\n            \"Excellent quality! Works like a charm and very durable. Extremely satisfied.\",\n            \"The product stopped working after three days. Very poor build and terrible customer service.\",\n            \"Good performance and decent battery life. Fast delivery and nice packaging.\",\n            \"Bad experience. Broken on arrival and unusable. Cheap plastic parts.\",\n            \"Amazing device! Exceeded my expectations. Beautiful design, super fast, and wonderful display.\"\n        ],\n        \"rating\": [\"5 out of 5\", \"2 out of 5\", \"4 out of 5\", \"1 out of 5\", \"5 out of 5\"]\n    })\n    df_init.to_csv(\"product_reviews.csv\", index=False)\n\ndf = pd.read_csv(\"product_reviews.csv\")\ndf[\"review\"] = df[\"review\"].fillna(\"\").astype(str)\n\nanalyzer = SentimentIntensityAnalyzer()\n\ndef classify_sentiment(text):\n    score = analyzer.polarity_scores(text)[\"compound\"]\n    if score >= 0.05:\n        return \"Positive\"\n    elif score <= -0.05:\n        return \"Negative\"\n    return \"Neutral\"\n\ndf[\"sentiment\"] = df[\"review\"].apply(classify_sentiment)\n\ndef generate_wordcloud(text, title, filename):\n    if not text.strip():\n        print(f\"No text available for: {title}\")\n        return\n\n    cloud = WordCloud(\n        width=1200,\n        height=600,\n        background_color=\"white\",\n        max_words=150,\n        collocations=False\n    ).generate(text)\n    \n    plt.figure(figsize=(12, 6))\n    plt.imshow(cloud, interpolation=\"bilinear\")\n    plt.axis(\"off\")\n    plt.title(title, fontsize=16, fontweight=\"bold\", pad=12)\n    plt.tight_layout()\n    plt.savefig(filename, dpi=300, bbox_inches=\"tight\")\n    plt.show()\n\n# 1. All reviews\nall_text = \" \".join(df[\"review\"])\ngenerate_wordcloud(all_text, \"WordCloud - All Reviews\", \"wordcloud_all.png\")\n\n# 2. Positive reviews\npositive_text = \" \".join(df.loc[df[\"sentiment\"] == \"Positive\", \"review\"])\ngenerate_wordcloud(positive_text, \"WordCloud - Positive Reviews\", \"wordcloud_positive.png\")\n\n# 3. Negative reviews\nnegative_text = \" \".join(df.loc[df[\"sentiment\"] == \"Negative\", \"review\"])\ngenerate_wordcloud(negative_text, \"WordCloud - Negative Reviews\", \"wordcloud_negative.png\")\n\ndf.to_csv(\"product_reviews_analyzed.csv\", index=False)\nprint(\"Sentiment counts:\")\nprint(df[\"sentiment\"].value_counts())\nprint(\"WordCloud images saved successfully.\")",
+          "output": "",
+          "outputImages": [],
+          "technologies": [
+            "Python",
+            "WordCloud",
+            "VADER",
+            "Matplotlib"
+          ],
+          "date": "2026",
+          "status": "Published"
+        },
+        {
+          "id": "8B(ii)",
+          "name": "Text Statistics and Distributions",
+          "description": "Calculate stopword count, numeric count, word count, character count, and average word length, and plot their frequency distributions.",
+          "code": "import re\nimport pandas as pd\nimport nltk\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom nltk.corpus import stopwords\nfrom collections import Counter\nimport os\n\n# Experiment 8B(ii): Distribution of Stopwords, Numerics, Word Count, Character Count, and Avg Word Length\n\nnltk.download(\"stopwords\", quiet=True)\n\nif not os.path.exists(\"product_reviews.csv\"):\n    df_init = pd.DataFrame({\n        \"title\": [\"Great product\", \"Not satisfied\", \"Worth buying\"],\n        \"review\": [\n            \"Excellent quality with 10 days battery life and 100 percent satisfaction.\",\n            \"Defective 2 items received out of 5 ordered. Completely broken.\",\n            \"Good value for 2026. Highly recommended!\"\n        ],\n        \"rating\": [\"5 out of 5\", \"1 out of 5\", \"4 out of 5\"]\n    })\n    df_init.to_csv(\"product_reviews.csv\", index=False)\n\ndf = pd.read_csv(\"product_reviews.csv\")\ndf[\"review\"] = df[\"review\"].fillna(\"\").astype(str)\n\nstop_words = set(stopwords.words(\"english\"))\n\ndef analyze_review(text):\n    tokens = re.findall(r\"\\b[\\w']+\\b\", text.lower())\n    words = re.findall(r\"\\b[A-Za-z]+\\b\", text)\n    numeric_tokens = re.findall(r\"\\b\\d+(?:\\.\\d+)?\\b\", text)\n\n    stopword_tokens = [token for token in tokens if token in stop_words]\n\n    return pd.Series({\n        \"word_count\": len(tokens),\n        \"character_count\": len(text),\n        \"numeric_count\": len(numeric_tokens),\n        \"stopword_count\": len(stopword_tokens),\n        \"average_word_length\": (\n            sum(len(word) for word in words) / len(words)\n            if words else 0\n        )\n    })\n\nstatistics = df[\"review\"].apply(analyze_review)\ndf = pd.concat([df, statistics], axis=1)\n\ndf.to_csv(\"review_statistics.csv\", index=False)\n\ncolumns = [\n    (\"stopword_count\", \"Stopword Count\"),\n    (\"numeric_count\", \"Numeric Token Count\"),\n    (\"word_count\", \"Word Count\"),\n    (\"character_count\", \"Character Count\"),\n    (\"average_word_length\", \"Average Word Length\")\n]\n\nfig, axes = plt.subplots(3, 2, figsize=(14, 15))\naxes = axes.flatten()\n\nfor i, (column, title) in enumerate(columns):\n    sns.histplot(data=df, x=column, kde=True, ax=axes[i], bins=15, color=\"#7c3aed\")\n    axes[i].set_title(title, fontweight=\"bold\")\n    axes[i].set_xlabel(title)\n    axes[i].set_ylabel(\"Number of Reviews\")\n\naxes[-1].axis(\"off\")\nplt.tight_layout()\nplt.savefig(\"review_statistics_distributions.png\", dpi=300)\nplt.show()\n\nall_tokens = re.findall(r\"\\b[\\w']+\\b\", \" \".join(df[\"review\"]).lower())\nstopword_frequency = Counter(token for token in all_tokens if token in stop_words)\n\nprint(\"Top 10 stopwords:\")\nprint(stopword_frequency.most_common(10))\n\nprint(\"\\nDescriptive statistics:\")\nprint(df[[\n    \"stopword_count\",\n    \"numeric_count\",\n    \"word_count\",\n    \"character_count\",\n    \"average_word_length\"\n]].describe())",
+          "output": "",
+          "outputImages": [],
+          "technologies": [
+            "Python",
+            "NLTK",
+            "Seaborn",
+            "Regex",
+            "Statistics"
+          ],
+          "date": "2026",
+          "status": "Published"
+        },
+        {
+          "id": "8B(iii)",
+          "name": "Sentiment Analysis using NLTK and VADER",
+          "description": "Calculate positive, negative, neutral, and compound scores and compare sentiment categories using NLTK VADER and standalone VADER.",
+          "code": "import pandas as pd\nimport nltk\nfrom nltk.sentiment.vader import SentimentIntensityAnalyzer as NLTKVADER\nfrom vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as StandaloneVADER\nimport os\n\n# Experiment 8B(iii): Display Sentiment Values Using NLTK and VADER\n\nnltk.download(\"vader_lexicon\", quiet=True)\n\nif not os.path.exists(\"product_reviews.csv\"):\n    df_init = pd.DataFrame({\n        \"title\": [\"Great\", \"Bad\", \"Okay\"],\n        \"review\": [\"The product is excellent.\", \"The quality is terrible.\", \"The product is okay.\"],\n        \"rating\": [\"5 out of 5\", \"1 out of 5\", \"3 out of 5\"]\n    })\n    df_init.to_csv(\"product_reviews.csv\", index=False)\n\ndf = pd.read_csv(\"product_reviews.csv\")\ndf[\"review\"] = df[\"review\"].fillna(\"\").astype(str)\n\nnltk_analyzer = NLTKVADER()\nvader_analyzer = StandaloneVADER()\n\ndef classify(score):\n    if score >= 0.05:\n        return \"Positive\"\n    elif score <= -0.05:\n        return \"Negative\"\n    return \"Neutral\"\n\n# NLTK VADER scores\nnltk_scores = df[\"review\"].apply(nltk_analyzer.polarity_scores)\ndf[\"nltk_positive\"] = nltk_scores.apply(lambda x: x[\"pos\"])\ndf[\"nltk_negative\"] = nltk_scores.apply(lambda x: x[\"neg\"])\ndf[\"nltk_neutral\"] = nltk_scores.apply(lambda x: x[\"neu\"])\ndf[\"nltk_compound\"] = nltk_scores.apply(lambda x: x[\"compound\"])\n\n# Standalone VADER scores\nvader_scores = df[\"review\"].apply(vader_analyzer.polarity_scores)\ndf[\"vader_positive\"] = vader_scores.apply(lambda x: x[\"pos\"])\ndf[\"vader_negative\"] = vader_scores.apply(lambda x: x[\"neg\"])\ndf[\"vader_neutral\"] = vader_scores.apply(lambda x: x[\"neu\"])\ndf[\"vader_compound\"] = vader_scores.apply(lambda x: x[\"compound\"])\n\ndf[\"nltk_sentiment\"] = df[\"nltk_compound\"].apply(classify)\ndf[\"vader_sentiment\"] = df[\"vader_compound\"].apply(classify)\n\n# Display sample results\nprint(df[[\n    \"review\",\n    \"nltk_compound\",\n    \"nltk_sentiment\",\n    \"vader_compound\",\n    \"vader_sentiment\"\n]].head(10).to_string(index=False))\n\nprint(\"\\nNLTK sentiment distribution:\")\nprint(df[\"nltk_sentiment\"].value_counts())\n\nprint(\"\\nStandalone VADER sentiment distribution:\")\nprint(df[\"vader_sentiment\"].value_counts())\n\ndf.to_csv(\"sentiment_analysis_results.csv\", index=False)\nprint(\"\\nResults saved to sentiment_analysis_results.csv\")",
+          "output": "",
+          "outputImages": [],
+          "technologies": [
+            "Python",
+            "NLTK",
+            "VADER",
+            "Sentiment Analysis"
+          ],
+          "date": "2026",
+          "status": "Published"
+        },
+        {
+          "id": "8B(iv)",
+          "name": "Scatter Intensity Plot of Sentiments",
+          "description": "Visualize the distribution and strength of review sentiments across the dataset with horizontal threshold boundaries.",
+          "code": "import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport os\n\n# Experiment 8B(iv): Create Scatter Intensity Plot of Sentiments\n\n# Ensure sentiment_analysis_results.csv exists\nif not os.path.exists(\"sentiment_analysis_results.csv\"):\n    df_seed = pd.DataFrame({\n        \"review\": [\n            \"Excellent quality! Highly recommended.\",\n            \"The product stopped working after 3 days. Terrible.\",\n            \"Good performance and fast delivery.\",\n            \"Broken on arrival, waste of money.\",\n            \"Super fast, wonderful display, loved it!\",\n            \"Mediocre quality, expected better.\",\n            \"Terrific value for money.\",\n            \"Worst online shopping experience ever.\"\n        ],\n        \"vader_compound\": [0.82, -0.65, 0.74, -0.71, 0.88, -0.15, 0.68, -0.78],\n        \"vader_sentiment\": [\"Positive\", \"Negative\", \"Positive\", \"Negative\", \"Positive\", \"Negative\", \"Positive\", \"Negative\"]\n    })\n    df_seed.to_csv(\"sentiment_analysis_results.csv\", index=False)\n\ndf = pd.read_csv(\"sentiment_analysis_results.csv\")\n\ndf[\"vader_compound\"] = pd.to_numeric(df[\"vader_compound\"], errors=\"coerce\")\ndf = df.dropna(subset=[\"vader_compound\"]).reset_index(drop=True)\n\ndf[\"review_index\"] = range(1, len(df) + 1)\n\npalette = {\n    \"Positive\": \"green\",\n    \"Negative\": \"red\",\n    \"Neutral\": \"gray\"\n}\n\nplt.figure(figsize=(14, 7))\n\nsns.scatterplot(\n    data=df,\n    x=\"review_index\",\n    y=\"vader_compound\",\n    hue=\"vader_sentiment\",\n    palette=palette,\n    s=85,\n    alpha=0.85\n)\n\n# Sentiment classification thresholds\nplt.axhline(y=0.05, color=\"green\", linestyle=\"--\", label=\"Positive threshold (0.05)\")\nplt.axhline(y=-0.05, color=\"red\", linestyle=\"--\", label=\"Negative threshold (-0.05)\")\nplt.axhline(y=0, color=\"black\", linestyle=\":\", label=\"Neutral reference (0.0)\")\n\nplt.ylim(-1.05, 1.05)\nplt.xlabel(\"Review Index\", fontsize=12, fontweight=\"bold\")\nplt.ylabel(\"VADER Compound Sentiment Score\", fontsize=12, fontweight=\"bold\")\nplt.title(\"Sentiment Intensity Scatter Plot of Product Reviews\", fontsize=15, fontweight=\"bold\", pad=12)\nplt.legend(loc=\"best\")\nplt.grid(alpha=0.25)\nplt.tight_layout()\n\nplt.savefig(\"sentiment_intensity_scatter.png\", dpi=300)\nplt.show()\n\nprint(\"Scatter intensity plot saved successfully as sentiment_intensity_scatter.png.\")",
+          "output": "",
+          "outputImages": [],
+          "technologies": [
+            "Python",
+            "Seaborn",
+            "Matplotlib",
+            "Data Visualization"
           ],
           "date": "2026",
           "status": "Published"

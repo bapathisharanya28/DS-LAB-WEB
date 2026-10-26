@@ -223,7 +223,6 @@ export default function ModuleModal({
                 className="inline-flex items-center gap-1 text-xs font-mono text-violet-600 dark:text-violet-400 hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Objective</span>
               </button>
             </div>
 
@@ -259,11 +258,11 @@ export default function ModuleModal({
             <div className="flex items-center justify-between">
               <label className="block text-xs font-mono uppercase tracking-wider text-stone-500 font-bold">Module PDFs</label>
               <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold cursor-pointer">
-                <FileText className="w-3.5 h-3.5" /> Add PDF(s)
+        
                 <input type="file" accept="application/pdf" multiple onChange={handlePdfUpload} className="hidden" />
               </label>
             </div>
-            <p className="text-xs text-stone-500">Add one or multiple PDF files. They will be available from the module overview.</p>
+           
             {pdfs.length > 0 && <div className="space-y-2">{pdfs.map((pdf, i) => <div key={pdf.id || i} className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-[#1a1233]"><span className="text-xs text-stone-800 dark:text-stone-200 truncate">{pdf.name}</span><button type="button" onClick={() => setPdfs((prev) => prev.filter((_, idx) => idx !== i))} className="text-xs text-rose-600 dark:text-rose-400">Remove</button></div>)}</div>}
           </div>
 
@@ -282,7 +281,7 @@ export default function ModuleModal({
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-600/30 transition-all cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{isEditing ? 'Update Module' : 'Save Module'}</span>
+            
             </button>
           </div>
 
